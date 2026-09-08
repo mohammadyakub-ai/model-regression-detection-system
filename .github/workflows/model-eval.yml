@@ -1,0 +1,82 @@
+name: model-eval
+
+on:
+  pull_request:
+    paths:
+      - 'prompts/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Cache eval history
+        uses: actions/cache@v4
+        with:
+          path: runs
+          key: eval-runs-${{ github.head_ref }}
+          restore-keys: |
+            eval-runs-
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run evaluation pipeline
+        id: eval
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENAI_BASE_URL: ${{ vars.OPENAI_BASE_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          EVAL_WARNING_PCT: ${{ vars.EVAL_WARNING_PCT }}
+          EVAL_CRITICAL_PCT: ${{ vars.EVAL_CRITICAL_PCT }}
+        run: |
+          python -m src.cli --runs-dir runs --report-dir reports
+        continue-on-error: false
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-report
+          path: reports/
+          retention-days: 30
+
+      - name: Comment on PR
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const s = JSON.parse(fs.readFileSync('reports/eval-summary.json', 'utf8'));
+            const emoji = { pass: '✅', warn: '⚠️', fail: '🔴' }[s.status] || '❔';
+            const delta = s.delta_pp != null ? ` (${s.delta_pp > 0 ? '+' : ''}${s.delta_pp} pp)` : '';
+            const lines = [
+              `${emoji} **Model eval: ${s.status.toUpperCase()}**`,
+              `- Prompt: \`${s.prompt}\` · Dataset: \`${s.dataset}\``,
+              `- Pass rate: ${(s.pass_rate * 100).toFixed(1)}%${delta}`,
+              s.regressions.length
+                ? `- Regressions: \`${s.regressions.join('`, `')}\``
+                : '- No regressions',
+              s.improvements.length
+                ? `- Improvements: \`${s.improvements.join('`, `')}\``
+                : null,
+              s.drift_detected ? `- ⚠️ **Slow drift:** ${s.drift_reason}` : null,
+              s.blocks_merge ? '- 🔴 **Merge blocked:** critical regressions detected' : null,
+            ].filter(Boolean).join('\n');
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: lines,
+            });

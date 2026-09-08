@@ -1,0 +1,809 @@
+{
+  "dataset_version": "golden_dataset_v1",
+  "created_at": "2026-08-21T12:00:00Z",
+  "description": "Hand-curated ground truth for the support email classifier. Human-written emails, human-verified labels. No LLM-generated content. Edge cases deliberately included and tagged.",
+  "schema": {
+    "id": "stable unique case id",
+    "input": "raw customer email text",
+    "expected": {
+      "category": "billing|technical|account|general",
+      "summary": "ideal one-sentence summary"
+    },
+    "expected_difficulty": "easy|medium|hard",
+    "notes": "why this case matters",
+    "edge_case_types": "optional list: ambiguous | short | typo | mixed_language | sarcasm"
+  },
+  "cases": [
+    {
+      "id": "case_0001",
+      "input": "Hi, I was charged twice for my subscription this month. My card was debited on both the 1st and the 3rd. Please refund the second charge.",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer was charged twice for a subscription and requests a refund."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Canonical billing case; matches the few-shot example shape so the model is likely to get it right."
+    },
+    {
+      "id": "case_0002",
+      "input": "I never received the invoice for last month. Can you send it again?",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer requests a copy of last month's missing invoice."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Invoice delivery is billing, not technical, even though it sounds like delivery."
+    },
+    {
+      "id": "case_0003",
+      "input": "Please cancel my subscription. I want to stop being billed from next month.",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer wants to cancel their subscription and stop billing."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Ambiguity trap: 'cancel my subscription' could be read as account management, but the billing intent is explicit.",
+      "edge_case_types": [
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "case_0004",
+      "input": "Why did the price go up? My plan was $19 and now it says $25. I didn't agree to this.",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer disputes an unagreed price increase on their plan."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Price-change dispute; tests whether the model understands it is a billing complaint, not a question."
+    },
+    {
+      "id": "case_0005",
+      "input": "My paymnet was declined and now my account shows overdue. But I paid last week, I have the bank statement.",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer says a payment that was declined is actually paid and disputes the overdue status."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Typo-rich email ('paymnet'); tests robustness to spelling errors and payment-status disputes.",
+      "edge_case_types": [
+        "typo"
+      ]
+    },
+    {
+      "id": "case_0006",
+      "input": "It has been 5 days since I requested a refund and I haven't heard anything. Status?",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer follows up on a refund request made five days ago."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Refund follow-up; single clear intent."
+    },
+    {
+      "id": "case_0007",
+      "input": "The promo code SUMMER2026 doesn't work at checkout. It says the code is invalid.",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer reports a promo code is rejected at checkout."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Discount code issues belong to billing/pricing, not technical."
+    },
+    {
+      "id": "case_0008",
+      "input": "I need to update the billing address on my account to the new office address.",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer wants to update the billing address on their account."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Billing address vs account address distinction."
+    },
+    {
+      "id": "case_0009",
+      "input": "My free trial ended yesterday but I was charged the full amount this morning. I only wanted to test the product, I wasn't ready to pay.",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer was charged at trial end without intending to start a paid plan."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Trial-to-paid conversion dispute; tests billing intent without explicit refund request."
+    },
+    {
+      "id": "case_0010",
+      "input": "I was charged in USD but I live in Europe. Can I pay in euros instead?",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer asks whether they can be billed in euros instead of USD."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Currency question; billing intent hidden inside a question."
+    },
+    {
+      "id": "case_0011",
+      "input": "Can you send me a receipt for my purchase on June 12th?",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer requests a receipt for a June 12th purchase."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Simple receipt request."
+    },
+    {
+      "id": "case_0012",
+      "input": "I cancelled my subscription last month and I'm STILL being charged. I have the cancellation confirmation email. This is theft.",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer was charged after cancelling and cites their cancellation confirmation."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Emotional escalation plus a specific factual claim; summary must capture both the charge and the proof offered."
+    },
+    {
+      "id": "case_0013",
+      "input": "Hello, our company received an overdue invoice from you but we never signed up for a paid plan. Please check.",
+      "expected": {
+        "category": "billing",
+        "summary": "Company disputes an overdue invoice for a plan they never signed up for."
+      },
+      "expected_difficulty": "hard",
+      "notes": "B2B invoice dispute; no refund request, just a request to investigate."
+    },
+    {
+      "id": "case_0014",
+      "input": "How much does the team plan cost per seat? We are a team of 12.",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer asks about team plan pricing for a 12-person team."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Pricing question before purchase."
+    },
+    {
+      "id": "case_0015",
+      "input": "Oh nice, another $49 mystery charge. I'm sure it's for something I definitely agreed to. Definitely. Surely my 'annual plan renewal' or whatever. Anyway, please fix it.",
+      "expected": {
+        "category": "billing",
+        "summary": "Sarcastic customer disputes an unexpected annual renewal charge."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Sarcasm must not be mistaken for general venting; the ask is still billing-related.",
+      "edge_case_types": [
+        "sarcasm"
+      ]
+    },
+    {
+      "id": "case_0016",
+      "input": "The app crashes every time I try to upload a file. It worked yesterday. Error code UPL-2048.",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer reports the app crashes during file upload with error UPL-2048."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Canonical technical case; mirrors a few-shot example."
+    },
+    {
+      "id": "case_0017",
+      "input": "I get 'Invalid credentials' when I try to log in, but my password is definitely correct.",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer cannot log in and sees an invalid credentials error despite a correct password."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Login failure; technical even though it involves an account, because the ask is about a malfunction.",
+      "edge_case_types": [
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "case_0018",
+      "input": "Everything is so slow lately. Loading a dashboard takes 20 seconds.",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer reports severe performance problems loading the dashboard."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Performance complaint; minimal detail."
+    },
+    {
+      "id": "case_0019",
+      "input": "After the latest update, the export button does nothing. I click it and nothing happens. No error, no file.",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer reports the export button stopped working after the latest update."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Regression-style bug report tied to a version update; the kind of case this system must catch."
+    },
+    {
+      "id": "case_0020",
+      "input": "The error message says 'Unexpected token Z in JSON at position 4'. I have no idea what that means and neither does my IT guy.",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer reports an incomprehensible technical error message and wants help."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Raw developer error message pasted by a non-technical user; summary must reflect confusion."
+    },
+    {
+      "id": "case_0021",
+      "input": "I lost three weeks of data when the sync failed. Is there any way to recover it?",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer reports losing three weeks of data after a sync failure and asks about recovery."
+      },
+      "expected_difficulty": "hard",
+      "notes": "High-stakes data loss; the emotional weight must not change the classification."
+    },
+    {
+      "id": "case_0022",
+      "input": "Our integration with your API started returning 500s this morning. We have a script that polls it hourly.",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer reports their API integration returns 500 errors since this morning."
+      },
+      "expected_difficulty": "medium",
+      "notes": "B2B technical case with an exact symptom window."
+    },
+    {
+      "id": "case_0023",
+      "input": "The mobile app doesn't sync with my desktop. Changes on the phone never show up on the laptop.",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer reports mobile app changes do not sync to the desktop app."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Sync complaint across devices."
+    },
+    {
+      "id": "case_0024",
+      "input": "Exporting my report to PDF fails every time. It works for CSV though.",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer reports PDF export fails while CSV export works."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Format-specific failure narrows the diagnosis; tests precision in the summary."
+    },
+    {
+      "id": "case_0025",
+      "input": "I keep getting logged out randomly in the middle of work. It happened 4 times today.",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer reports being randomly logged out four times in one day."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Session issue; technical malfunction, not an account access request."
+    },
+    {
+      "id": "case_0026",
+      "input": "I signed up two days ago and I haven't received a single email from you. Not the welcome, not the confirmation.",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer reports not receiving any emails since signing up two days ago."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Email delivery is technical; easy to mislabel as billing (invoice-related).",
+      "edge_case_types": [
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "case_0027",
+      "input": "The video won't load in my browser. It just shows a black screen with a spinner.",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer reports a video that will not load and shows a black screen."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Media playback failure."
+    },
+    {
+      "id": "case_0028",
+      "input": "Since the update on Monday, the whole app is just a white screen. I tried clearing the cache.",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer reports a white screen after Monday's update despite clearing the cache."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Blank-screen regression after an update; customer already tried a workaround."
+    },
+    {
+      "id": "case_0029",
+      "input": "It works in Chrome on my laptop but the desktop app shows an error every time I open a project.",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer reports project errors in the desktop app while Chrome works."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Platform-specific failure requires careful summary; easy to overgeneralize."
+    },
+    {
+      "id": "case_0030",
+      "input": "It's broken. Please fix.",
+      "expected": {
+        "category": "technical",
+        "summary": "Customer reports something is broken without providing details."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Extremely short and vague; classification must not fail, the summary should flag the missing detail.",
+      "edge_case_types": [
+        "short"
+      ]
+    },
+    {
+      "id": "case_0031",
+      "input": "I forgot my password and can't get into my account.",
+      "expected": {
+        "category": "account",
+        "summary": "Customer forgot their password and cannot access their account."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Canonical account case; also appears in few-shot examples."
+    },
+    {
+      "id": "case_0032",
+      "input": "Please update the email address on my account from the old one to newmail@example.com.",
+      "expected": {
+        "category": "account",
+        "summary": "Customer wants the email address on their account updated."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Profile change request."
+    },
+    {
+      "id": "case_0033",
+      "input": "I want to delete my account and all the data in it.",
+      "expected": {
+        "category": "account",
+        "summary": "Customer requests full account deletion including their data."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Account deletion is account, not billing, even if it ends billing too."
+    },
+    {
+      "id": "case_0034",
+      "input": "I lost my phone and the authenticator app with it. I can't get the 2FA code anymore. My account is locked out.",
+      "expected": {
+        "category": "account",
+        "summary": "Customer lost their 2FA device and is locked out of their account."
+      },
+      "expected_difficulty": "hard",
+      "notes": "2FA lockout; high friction, high stakes."
+    },
+    {
+      "id": "case_0035",
+      "input": "My account got locked after too many wrong password attempts. Can you unlock it?",
+      "expected": {
+        "category": "account",
+        "summary": "Customer's account was locked after failed login attempts and wants it unlocked."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Locked-account recovery; account even though it started with login attempts.",
+      "edge_case_types": [
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "case_0036",
+      "input": "How do I change my username? I picked something stupid years ago.",
+      "expected": {
+        "category": "account",
+        "summary": "Customer asks how to change their username."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Simple profile question."
+    },
+    {
+      "id": "case_0037",
+      "input": "Please add a new teammate to our workspace. Her email is jane@ourcompany.com and she needs editor access.",
+      "expected": {
+        "category": "account",
+        "summary": "Customer requests a new teammate be added to the workspace with editor access."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Workspace administration is account management, not billing."
+    },
+    {
+      "id": "case_0038",
+      "input": "Someone logged into my account from a different country. I changed my password but I'm worried. Please check for suspicious activity.",
+      "expected": {
+        "category": "account",
+        "summary": "Customer suspects unauthorized access from another country and asks for an account check."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Security concern; must not be downgraded to a generic password question."
+    },
+    {
+      "id": "case_0039",
+      "input": "I have two accounts and I'd like to merge them into one. Is that possible?",
+      "expected": {
+        "category": "account",
+        "summary": "Customer asks whether their two accounts can be merged."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Uncommon request; tests the model against a request it has never seen."
+    },
+    {
+      "id": "case_0040",
+      "input": "Our company rebranded. Can you change the company name shown on our account?",
+      "expected": {
+        "category": "account",
+        "summary": "Customer wants the company name on their account updated after a rebrand."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Profile update at company level."
+    },
+    {
+      "id": "case_0041",
+      "input": "I want to close my account entirely. What happens to my remaining subscription credits?",
+      "expected": {
+        "category": "account",
+        "summary": "Customer wants to close their account and asks what happens to unused credits."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Deliberate ambiguity: account closure with a billing question embedded; the primary ask is account closure.",
+      "edge_case_types": [
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "case_0042",
+      "input": "Why can't I see the admin settings? I'm the owner of the workspace.",
+      "expected": {
+        "category": "account",
+        "summary": "Workspace owner asks why they cannot access admin settings."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Permissions question; account-level, not a technical error."
+    },
+    {
+      "id": "case_0043",
+      "input": "I deactivated my account for the summer and now I want it back. All my data still there?",
+      "expected": {
+        "category": "account",
+        "summary": "Customer wants their deactivated account reactivated and asks if their data remains."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Reactivation flow with a data question."
+    },
+    {
+      "id": "case_0044",
+      "input": "I need a copy of all my personal data for a GDPR request.",
+      "expected": {
+        "category": "account",
+        "summary": "Customer requests a copy of their personal data under GDPR."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Data export for privacy rights; account/privacy domain."
+    },
+    {
+      "id": "case_0045",
+      "input": "Please make me an admin on our team account. My colleague is the owner.",
+      "expected": {
+        "category": "account",
+        "summary": "Customer asks to be made an admin on their team account."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Role change request."
+    },
+    {
+      "id": "case_0046",
+      "input": "It would be great if you added dark mode. Half of our team works at night.",
+      "expected": {
+        "category": "general",
+        "summary": "Customer requests a dark mode feature for night-time work."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Feature request; no malfunction, no billing, no account change."
+    },
+    {
+      "id": "case_0047",
+      "input": "Hello, we are an analytics company and we'd love to discuss a partnership with you. Who should we talk to?",
+      "expected": {
+        "category": "general",
+        "summary": "Company proposes a partnership and asks for the right contact."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Partnership inquiry; general business outreach."
+    },
+    {
+      "id": "case_0048",
+      "input": "Yeah the app is great. Really. The design, the speed, everything is absolutely perfect. Why would anyone ever want a dark mode? Anyway, back to my issue: the search in my inbox is completely broken and has been for a week.",
+      "expected": {
+        "category": "technical",
+        "summary": "Sarcastic customer reports inbox search has been broken for a week."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Heavy sarcasm wrapping a real bug report; the actionable ask is technical.",
+      "edge_case_types": [
+        "sarcasm"
+      ]
+    },
+    {
+      "id": "case_0049",
+      "input": "Hola, escribo desde España. Mi factura de julio no me ha llegado y necesito una copia. Muchas gracias.",
+      "expected": {
+        "category": "billing",
+        "summary": "Spanish-speaking customer requests a copy of their missing July invoice."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Mixed-language email (Spanish with an English domain context); must classify by content, not language.",
+      "edge_case_types": [
+        "mixed_language"
+      ]
+    },
+    {
+      "id": "case_0050",
+      "input": "hi",
+      "expected": {
+        "category": "general",
+        "summary": "Customer sent only a greeting with no request."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Extremely short edge case; nothing actionable, must not guess a category.",
+      "edge_case_types": [
+        "short"
+      ]
+    },
+    {
+      "id": "case_0051",
+      "input": "The new dashboard layout is confusing. I can't find where my reports went. Other people on my team agree.",
+      "expected": {
+        "category": "general",
+        "summary": "Customer gives feedback that the new dashboard layout is confusing."
+      },
+      "expected_difficulty": "medium",
+      "notes": "UX feedback; not a technical malfunction, no direct request."
+    },
+    {
+      "id": "case_0052",
+      "input": "Hi, I'm a student researching AI tools for a university paper. Could I interview someone on your team for 20 minutes?",
+      "expected": {
+        "category": "general",
+        "summary": "Student requests an interview with the team for a university research paper."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Research request; clearly general."
+    },
+    {
+      "id": "case_0053",
+      "input": "Just wanted to say the support team is amazing. You helped me last week and everything works now. Thanks!",
+      "expected": {
+        "category": "general",
+        "summary": "Customer thanks the support team for resolving their issue last week."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Pure compliment; no action needed, must not invent a category."
+    },
+    {
+      "id": "case_0054",
+      "input": "What's on your roadmap for this year? We're deciding whether to commit to your tool long-term.",
+      "expected": {
+        "category": "general",
+        "summary": "Prospective long-term customer asks about this year's product roadmap."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Roadmap question with buying intent; still general information, not billing."
+    },
+    {
+      "id": "case_0055",
+      "input": "Honestly I don't understand what your product does. I signed up after an ad but nothing makes sense.",
+      "expected": {
+        "category": "general",
+        "summary": "Customer is confused about what the product does after signing up."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Product confusion; not technical (nothing malfunctioning) and not account (no access issue).",
+      "edge_case_types": [
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "case_0056",
+      "input": "Your competitor's tool does everything you do for half the price. Should I just switch?",
+      "expected": {
+        "category": "general",
+        "summary": "Customer compares the product unfavorably to a competitor and questions whether to switch."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Competitor comparison; not a billing complaint even though pricing is mentioned.",
+      "edge_case_types": [
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "case_0057",
+      "input": "Do you have an office in Berlin? My team is looking for local vendors.",
+      "expected": {
+        "category": "general",
+        "summary": "Customer asks whether the company has a Berlin office."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Unrelated company question."
+    },
+    {
+      "id": "case_0058",
+      "input": "Wishing everyone a great holiday season! Thanks for a good year.",
+      "expected": {
+        "category": "general",
+        "summary": "Customer sends seasonal greetings and thanks."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Holiday greeting; must not be misread as account or billing."
+    },
+    {
+      "id": "case_0059",
+      "input": "I have been with you for three years and I have NEVER seen such terrible support. Do better. That is all.",
+      "expected": {
+        "category": "general",
+        "summary": "Long-term customer complains about support quality without a specific request."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Pure venting with no actionable ask; summary must state the complaint and the absence of a request."
+    },
+    {
+      "id": "case_0060",
+      "input": "Hi, I'm a journalist from TechDaily covering AI startups. Could we get a comment or a quote from your CEO for a story?",
+      "expected": {
+        "category": "general",
+        "summary": "Journalist requests a comment from the CEO for a TechDaily article."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Press inquiry; general outreach."
+    },
+    {
+      "id": "case_0061",
+      "input": "Can you tell me what time it is in Shanghai?",
+      "expected": {
+        "category": "general",
+        "summary": "Customer asks an unrelated factual question."
+      },
+      "expected_difficulty": "easy",
+      "notes": "Deliberately unrelated; also present in the v2 few-shot examples to reinforce the general fallback."
+    },
+    {
+      "id": "case_0062",
+      "input": "My subscription renews tomorrow but I want to change it to the yearly plan first. Is that possible before the renewal?",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer wants to switch to the yearly plan before tomorrow's renewal."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Plan change timed against a renewal; billing, but tests timing comprehension."
+    },
+    {
+      "id": "case_0063",
+      "input": "My card keeps getting declined at checkout but my bank says the card is fine. The error message says 'payment declined - invalid merchant configuration'. Help?",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer reports card declines at checkout despite the bank confirming the card is fine."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Splits the difference between billing (payment failure) and technical (config error message); billing wins because the pain point is the charge.",
+      "edge_case_types": [
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "case_0064",
+      "input": "My password stopped working out of nowhere. I didn't change it. Did you disable my account?",
+      "expected": {
+        "category": "account",
+        "summary": "Customer cannot log in with a password that stopped working and fears their account was disabled."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Sits between technical (login malfunction) and account (access); the fear of a disabled account makes account the right call.",
+      "edge_case_types": [
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "case_0065",
+      "input": "plese fix my acount. its bin locking me out every day since the last update. this is the 5th time now.",
+      "expected": {
+        "category": "account",
+        "summary": "Customer reports their account has locked them out daily since the last update."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Multiple typos plus a technical trigger ('since the last update') wrapping an account access problem.",
+      "edge_case_types": [
+        "typo",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "case_0066",
+      "input": "Bonjour, je ne peux plus me connecter a mon compte depuis ce matin. It worked fine yesterday. Merci de m'aider.",
+      "expected": {
+        "category": "technical",
+        "summary": "French-speaking customer reports being unable to log in since this morning."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Mixed French/English; login malfunction is technical per the category definitions, even though it involves an account.",
+      "edge_case_types": [
+        "mixed_language"
+      ]
+    },
+    {
+      "id": "case_0067",
+      "input": "Help me. My email.",
+      "expected": {
+        "category": "general",
+        "summary": "Customer sent an incomplete message about their email with no clear request."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Too incomplete to classify; must fall back to general rather than guess account or technical.",
+      "edge_case_types": [
+        "short"
+      ]
+    },
+    {
+      "id": "case_0068",
+      "input": "Oh sure, lock me out again. I'm SURE it's for my own safety. I love the 'security'. Anyway, can I get back in or should I just start a new account?",
+      "expected": {
+        "category": "account",
+        "summary": "Sarcastic customer asks to regain access after being locked out."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Sarcasm wraps a real access request; summary must capture the ask, not the tone.",
+      "edge_case_types": [
+        "sarcasm"
+      ]
+    },
+    {
+      "id": "case_0069",
+      "input": "Ai un problema con mi factura, me cobraron dos veces este mes. Pls send the money back. Thx.",
+      "expected": {
+        "category": "billing",
+        "summary": "Spanish-speaking customer reports a double charge and requests a refund."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Mixed Spanish/English plus informal abbreviations; double charge + refund request is billing.",
+      "edge_case_types": [
+        "mixed_language",
+        "typo"
+      ]
+    },
+    {
+      "id": "case_0070",
+      "input": "I don't want to pay for this anymore. What are my options?",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer wants to stop paying and asks what options exist."
+      },
+      "expected_difficulty": "medium",
+      "notes": "Ambiguous between billing (stop paying) and general (open question); the explicit refusal to pay points to billing.",
+      "edge_case_types": [
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "case_0071",
+      "input": "UNSUBSCRIBE",
+      "expected": {
+        "category": "general",
+        "summary": "Customer unsubscribes from emails."
+      },
+      "expected_difficulty": "medium",
+      "notes": "One word, all caps; an email-preference request that belongs to none of the support categories and must not become account.",
+      "edge_case_types": [
+        "short"
+      ]
+    },
+    {
+      "id": "case_0072",
+      "input": "Stop charging me. I deleted my account months ago and you still take money from my card every month.",
+      "expected": {
+        "category": "billing",
+        "summary": "Customer is still being charged after deleting their account months ago."
+      },
+      "expected_difficulty": "hard",
+      "notes": "Deliberate ambiguity: account deletion vs continued billing; the active ask is to stop charges, so billing.",
+      "edge_case_types": [
+        "ambiguous"
+      ]
+    }
+  ]
+}

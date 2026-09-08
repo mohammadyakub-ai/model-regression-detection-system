@@ -1,0 +1,1 @@
+from . import env  # noqa: F401  - loads .env on package import
