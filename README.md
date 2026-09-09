@@ -1,5 +1,15 @@
 # Model Regression Detection System
 
+## Demo walkthrough
+
+<video controls preload="metadata" poster="assets/demo-poster.jpg" width="100%" src="assets/CICD-for-AI-prompts.mp4"></video>
+
+A 90-second overview of the system running end to end — a prompt change, the eval pass, the Slack alert, and the diff report.
+
+[▶ Full 4-minute project walkthrough (Google Drive)](https://drive.google.com/file/d/1_H-HhZFL8x6ngjqMky3mFFFltT75p7Bz/view?usp=sharing)
+
+> GitHub only plays raw video files that live in the repository. The clip above is the in-repo teaser; the Drive link holds the complete walkthrough covering every phase.
+
 ## What this is
 
 This repository contains a CI/CD-style evaluation pipeline for a customer-support email classifier. Whenever a prompt or model changes, the pipeline runs the feature against a hand-curated golden dataset, scores each case on four dimensions (category accuracy, LLM-judged summary quality, latency, and token usage), diffs the result against the previous run, and reports regressions — per-run via a self-contained HTML report and Slack, and cross-run via a moving-average drift check. Critical regressions block merges. The evaluation logic is fully decoupled from the feature under test through a typed interface contract, so any LLM feature that satisfies the contract can be dropped in and evaluated with zero pipeline changes.
