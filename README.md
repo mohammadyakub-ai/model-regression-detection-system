@@ -318,7 +318,7 @@ Thank you for helping improve this project 🚀
 ## 👤 Author
 
 **Yakub Mohammad**
-GitHub: [@Mohammadyakub221](https://github.com/Mohammadyakub221)
+GitHub: [@mohammadyakub-ai](https://github.com/mohammadyakub-ai)
 
 Built to explore **CI/CD discipline applied to LLM prompts** and **production-grade eval pipelines**.
 
