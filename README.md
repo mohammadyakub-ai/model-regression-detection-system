@@ -50,13 +50,11 @@ This project treats a prompt exactly like source code: **versioned, tested again
 
 ## 🎥 Demo
 
-<video controls preload="metadata" poster="https://github.com/mohammadyakub-ai/model-regression-detection-system/raw/master/assets/CICD-for-AI-prompts-thumbnail.png" width="100%" src="https://github.com/mohammadyakub-ai/model-regression-detection-system/raw/master/assets/CICD-for-AI-prompts.mp4"></video>
+![Model Regression Detection System demo](assets/demo-teaser.gif)
 
 A 90-second walkthrough — a prompt change, the eval run, the Slack alert, and the diff report.
 
 **[▶ Full 4-minute walkthrough (Google Drive)](https://drive.google.com/file/d/1_H-HhZFL8x6ngjqMky3mFFFltT75p7Bz/view?usp=sharing)** — covers every phase in detail.
-
-> GitHub only plays video files that live in the repository, so the clip above is a teaser; the Drive link holds the complete walkthrough.
 
 ---
 
