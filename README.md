@@ -50,7 +50,7 @@ This project treats a prompt exactly like source code: **versioned, tested again
 
 ## 🎥 Demo
 
-<video controls preload="metadata" poster="assets/CICD-for-AI-prompts-thumbnail.png" width="100%" src="assets/CICD-for-AI-prompts.mp4"></video>
+<video controls preload="metadata" poster="https://github.com/mohammadyakub-ai/model-regression-detection-system/raw/master/assets/CICD-for-AI-prompts-thumbnail.png" width="100%" src="https://github.com/mohammadyakub-ai/model-regression-detection-system/raw/master/assets/CICD-for-AI-prompts.mp4"></video>
 
 A 90-second walkthrough — a prompt change, the eval run, the Slack alert, and the diff report.
 
